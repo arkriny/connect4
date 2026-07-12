@@ -14,7 +14,7 @@ class Game:
 
     def move(self, move):
         if not (0 <= move < self.COLS):
-            return False
+            raise ValueError('move out of range')
         for i in range(self.ROWS-1, -1, -1):
             if self.grid[i][move] == 0:
                 self.grid[i][move] = self.player
@@ -26,13 +26,13 @@ class Game:
                             count += 1
                             if count == 4:
                                 self.ended = True
-                                return True
+                                return
                         else:
                             count = 0
 
                 self.player = 3 - self.player
-                return True
-        return False
+                return
+        raise ValueError('column is full')
 
     def render(self):
         for row in self.grid:
@@ -66,8 +66,14 @@ while True:
 
     print_player(game.player)
     print(f"'s turn. Enter the move (1-{game.COLS}): ", end='')
-    while True:
-        move = int(input())
-        if game.move(move-1):
-            break
-        print('Invalid move, try again: ', end='')
+    try:
+        while True:
+            try:
+                move = int(input().strip())
+                game.move(move-1)
+                break
+            except ValueError as e:
+                print(f'Invalid input: {e}, try again: ', end='')
+    except BaseException:
+        print()
+        break
